@@ -5844,6 +5844,18 @@ public final class Settings {
         public static final String QS_TILE_VERTICAL_LAYOUT = "qs_tile_vertical_layout";
 
         /**
+         * reTicker Status
+         * @hide
+         */
+        public static final String RETICKER_STATUS = "reticker_status";
+
+        /**
+         * reTicker Colored
+         * @hide
+         */
+        public static final String RETICKER_COLORED = "reticker_colored";
+
+        /**
          * @hide
          */
         public static final String QS_TILE_LABEL_HIDE = "qs_tile_label_hide";
