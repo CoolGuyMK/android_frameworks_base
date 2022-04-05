@@ -5229,22 +5229,25 @@ public final class NotificationPanelViewController extends PanelViewController {
             String mergedContentText = reTickerAppName + " " + reTickerContent;
             mReTickerComebackIcon.setImageDrawable(icon);
             Drawable dw = mView.getContext().getDrawable(R.drawable.reticker_background);
-            if (mReTickerColored) {
-                int col = notification.color;
-                // check if we need to override the color
-                if ((mAppExceptions.length & 1) == 0) {
-                    for (int i = 0; i < mAppExceptions.length; i += 2) {
-                        if (mAppExceptions[i].equals(pkgname)) {
-                            col = Color.parseColor(mAppExceptions[i + 1]);
-                            break;
-                        }
+            boolean reTickerColored = Settings.System.getIntForUser(mView.getContext().getContentResolver(),
+                    Settings.System.RETICKER_COLORED, 0, UserHandle.USER_CURRENT) != 0;
+            if (reTickerColored) {
+                int col;
+                col = row.getEntry().getSbn().getNotification().color;
+                mAppExceptions = mView.getContext().getResources().getStringArray(R.array.app_exceptions);
+                //check if we need to override the color
+                for (int i=0; i < mAppExceptions.length; i++) {
+                    if (mAppExceptions[i].contains(pkgname)) {
+                        col = Color.parseColor(mAppExceptions[i+=1]);
                     }
                 }
-                Drawable dw = mView.getContext().getDrawable(R.drawable.reticker_background);
                 dw.setTint(col);
-                mReTickerComeback.setBackground(dw);
+            } else {
+                dw.setTintList(null);
             }
+            mReTickerComeback.setBackground(dw);
             mReTickerContentTV.setText(mergedContentText);
+            mReTickerContentTV.setTextAppearance(mView.getContext(), R.style.TextAppearance_Notifications_reTicker);
             mReTickerContentTV.setSelected(true);
             RetickerAnimations.doBounceAnimationIn(mReTickerComeback);
             if (reTickerIntent != null) {
@@ -5279,14 +5282,6 @@ public final class NotificationPanelViewController extends PanelViewController {
         } else {
             mReTickerComeback.getViewTreeObserver().removeOnComputeInternalInsetsListener(mInsetsListener);
         }
-    }
-
-    public void reTickerViewUpdate() {
-        boolean reTickerStatus = Settings.System.getIntForUser(mView.getContext().getContentResolver(),
-                Settings.System.RETICKER_STATUS, 0, UserHandle.USER_CURRENT) != 0;
-        if (reTickerStatus) return;
-        if (mReTickerComeback != null) mReTickerComeback.setBackground(mView.getContext().getDrawable(R.drawable.reticker_background));
-        if (mReTickerContentTV != null) mReTickerContentTV.setTextAppearance(mView.getContext(), R.style.TextAppearance_Notifications_reTicker);
     }
 
     public void reTickerDismissal() {
