@@ -76,6 +76,7 @@ public class NotificationInterruptStateProviderImpl implements NotificationInter
     protected boolean mUseHeadsUp = false;
 
     private boolean mLessBoringHeadsUp = false;
+    private boolean mReTicker = false;
     private TelecomManager mTm;
     private Context mContext;
 
@@ -281,8 +282,8 @@ public class NotificationInterruptStateProviderImpl implements NotificationInter
             return false;
         }
 
-        if (mLessBoringHeadsUp && shouldSkipHeadsUp(sbn)) {
-            // mLogger.logNoHeadsUpShouldSkipPackage(sbn);
+        if (!mReTicker && shouldSkipHeadsUp(entry)) {
+            mLogger.logNoHeadsUpShouldSkipPackage(entry);
             return false;
         }
 
@@ -382,9 +383,13 @@ public class NotificationInterruptStateProviderImpl implements NotificationInter
         mLessBoringHeadsUp = lessBoring;
     }
 
-    public boolean shouldSkipHeadsUp(StatusBarNotification sbn) {
-        if (mStatusBarStateController.isDozing()) return false;
-        String notificationPackageName = sbn.getPackageName();
+    @Override
+    public void setUseReticker(boolean reTicker) {
+        mReTicker = reTicker;
+    }
+
+    public boolean shouldSkipHeadsUp(NotificationEntry entry) {
+        String notificationPackageName = entry.getSbn().getPackageName();
 
         boolean isLessBoring = notificationPackageName.equals(getDefaultDialerPackage(mTm))
                 || notificationPackageName.equals(getDefaultSmsPackage(mContext))
